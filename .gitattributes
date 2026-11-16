@@ -1,0 +1,14 @@
+# Atrybuty plików
+
+# Normalizacja końców linii (projekt jest tworzony na Linuksie)
+* text=auto eol=lf
+
+# Zasoby binarne — bez konwersji końców linii
+*.woff2 binary
+*.png binary
+*.jpg binary
+*.webp binary
+
+# Biblioteki zewnętrzne: nie pokazuj ich w statystyce języka ani w diffach
+js/vendor/* linguist-vendored
+*.min.js linguist-generated

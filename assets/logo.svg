@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Biblioteka">
+  <!-- Kolor NIE jest już twardo wpisany: litera B i strony książki biorą
+       `currentColor`. W nagłówku aplikacji logo jest wstawiane jako inline SVG,
+       więc dziedziczy akcent aktywnego motywu. Ten plik służy jako favicon
+       (renderuje się poza dokumentem, bez dostępu do tokenów), dlatego niżej
+       stoi neutralny kolor zapasowy — jasny szary, bez niebieskiego. -->
+  <style>
+    svg { color: #cbd5e1; }
+  </style>
+  <rect width="512" height="512" rx="112" fill="#0E1526"/>
+  <!-- litera B (zliczona evenodd — liczniki wycięte) -->
+  <path fill="currentColor" fill-rule="evenodd" d="
+    M150 84 H272
+    C325 84 356 112 356 154
+    C356 183 339 205 313 214
+    C346 222 367 247 367 282
+    C367 330 332 362 278 362
+    H150 Z
+    M204 136 H266
+    C290 136 302 146 302 165
+    C302 184 290 194 266 194
+    H204 Z
+    M204 244 H276
+    C302 244 315 255 315 277
+    C315 299 302 310 276 310
+    H204 Z"/>
+  <!-- otwarta książka pod literą -->
+  <path fill="currentColor" d="M64 404 C124 380 200 380 248 402 L248 470 C200 448 124 448 64 472 Z"/>
+  <path fill="currentColor" d="M448 404 C388 380 312 380 264 402 L264 470 C312 448 388 448 448 472 Z"/>
+</svg>

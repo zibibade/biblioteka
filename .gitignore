@@ -1,0 +1,21 @@
+# Nigdy do gita (sekrety i pliki z maszyny/serwera):
+.env
+# hasla DB + haslo dostepu -> w repo jest config.example.php
+config.php
+# okladki i zdjecia egzemplarzy (zyja tylko na serwerze)
+uploads/*
+# ...ale plik .htaccess w uploads/ jedzie z repo (blokuje listowanie katalogu)
+!uploads/.htaccess
+*.log
+# testy: zaleznosci composerowe i cache phpunit (vendor/ instalowany lokalnie)
+/vendor/
+.phpunit.cache
+
+# kopia konfiguracji z prawdziwymi haslami — nigdy do repo (wycieklo by na GitHub)
+config_modified.php
+
+# zasady dla agenta kodujacego: lokalny symlink do pliku poza repozytorium
+AGENTS.md
+
+# znacznik zakończonej instalacji (instalator sam się nim blokuje)
+install.lock

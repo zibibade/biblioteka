@@ -1,0 +1,48 @@
+# Biblioteka — wariant Docker (do self-hostingu i do wypróbowania na własnym komputerze).
+#
+#   cp .env.example .env      # ustaw hasła
+#   docker compose up -d --build
+#   http://localhost:8080
+#
+# Konfiguracja (config.php) powstaje przy pierwszym starcie ze zmiennych
+# środowiskowych — instalator w przeglądarce nie jest tu potrzebny.
+
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${BIB_DB_NAME:-biblioteka}
+      MYSQL_USER: ${BIB_DB_USER:-biblioteka}
+      MYSQL_PASSWORD: ${BIB_DB_PASS:-biblioteka}
+      MYSQL_ROOT_PASSWORD: ${BIB_DB_ROOT_PASS:-rootbiblioteka}
+    volumes:
+      - db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${BIB_PORT:-8080}:80"
+    environment:
+      BIB_DB_HOST: db
+      BIB_DB_PORT: "3306"
+      BIB_DB_NAME: ${BIB_DB_NAME:-biblioteka}
+      BIB_DB_USER: ${BIB_DB_USER:-biblioteka}
+      BIB_DB_PASS: ${BIB_DB_PASS:-biblioteka}
+      BIB_APP_PASSWORD: ${BIB_APP_PASSWORD:-zmien-to-haslo}
+      BIB_GOOGLE_KEY: ${BIB_GOOGLE_KEY:-}
+    volumes:
+      - uploads:/var/www/html/uploads
+
+volumes:
+  db:
+  uploads:

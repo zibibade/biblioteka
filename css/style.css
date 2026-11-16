@@ -1,0 +1,1929 @@
+/* ============================================================================
+   Biblioteka — system wizualny „Rytm kodu"
+   Ciemna powłoka, jedyna rodzina barw to czerń z odcieniem niebieskim,
+   akcent #3B82F6. Hierarchia wagą i skalą, nie ornamentem. Powłoka PWA —
+   dlatego font self-hosted (patrz @font-face na górze).
+   ========================================================================= */
+
+/* ------------------------------------------------------------------- fonty */
+
+@font-face {
+    font-family: 'Manrope';
+    font-style: normal;
+    font-weight: 400 800;
+    font-display: swap;
+    src: url('../assets/fonts/manrope-latin-ext.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+        U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+        U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Manrope';
+    font-style: normal;
+    font-weight: 400 800;
+    font-display: swap;
+    src: url('../assets/fonts/manrope-latin.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+        U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+        U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ------------------------------------------------------------------- tokeny */
+
+:root {
+    /* Powierzchnie — zimne, nie neutralne: każda ma w sobie odcień niebieski */
+    --bg:            #080b12;
+    --bg-gleba:      #0b1018;   /* wstępne tło ekranu logowania */
+    --pow-1:         #0e1420;   /* karta, powierzchnia elementu */
+    --pow-2:         #131c2b;   /* pole formularza, wiersz po najechaniu */
+    --pow-3:         #1a2434;   /* przycisk wsteczny, menu */
+    --pow-wznoszona: #18212f;   /* element unoszący się: menu, modal */
+
+    /* Linie — włosowe, nie cienie tam, gdzie płaskość jest czytelniejsza */
+    --linia:         rgba(125, 165, 225, 0.13);
+    --linia-mocna:   rgba(125, 165, 225, 0.24);
+    --linia-cicha:   rgba(125, 165, 225, 0.07);
+
+    /* Tekst */
+    --tekst:         #e8eef8;
+    --tekst-2:       #9aabc6;
+    --tekst-3:       #8494ad;
+
+    /* Tekst na akcencie */
+    --na-akcencie:   #08101f;
+
+    /* Akcent — jedyna barwa */
+    --akcent:        #3b82f6;
+    --akcent-jasny:  #7fb0ff;   /* tekst na ciemnym tle */
+    --akcent-ciemny: #1d4ed8;
+    --akcent-hover:  #4c8bf5;   /* jaśniej na hover: ciemny tekst zostaje czytelny */
+    --akcent-tlo:    rgba(59, 130, 246, 0.14);
+    --akcent-obwod:  rgba(59, 130, 246, 0.42);
+
+    /* Stany (kształt niesie informację, nie sam kolor) */
+    --ok:            #34d399;
+    --ostrzezenie:   #fbbf24;
+    --blad:          #f87171;
+
+    /* Kształt */
+    --r-kontrolka:   10px;
+    --r-powierzchnia: 14px;
+    --r-chip:        999px;
+
+    /* Cienie — tylko tam, gdzie element naprawdę unosi się */
+    --cien-menu:     0 1px 0 var(--linia-cicha), 0 18px 40px -12px rgba(0, 0, 0, 0.75);
+    --cien-modal:    0 32px 80px -20px rgba(0, 0, 0, 0.85);
+    --cien-karta:    0 1px 0 var(--linia-cicha) inset;
+
+    /* Rytm — jedna skala odstępów */
+    --p-1: 4px;  --p-2: 8px;  --p-3: 12px; --p-4: 16px;
+    --p-5: 24px; --p-6: 32px; --p-7: 48px;
+
+    --tap: 44px;   /* minimalny cel dotykowy w głównych przepływach */
+
+    /* Układ — tyle maksymalnie zajmuje treść. Na wąskich ekranach kolumna
+       wypełnia całość, na szerokich (1440, 1920, 2560…) stoi na środku,
+       zamiast rozlewać się po krawędzi monitora. */
+    --max-kolumna: 1280px;
+}
+
+/* ------------------------------------------------------- motyw: Narzędzia */
+
+/* Drugi motyw nadpisuje WYŁĄCZNIE kolory — te same nazwy tokenów, więc cały
+   arkusz działa bez zmian. Kształt, promienie, cienie i odstępy zostają
+   wspólne. Styl „prostych stron narzędzi": ciemny slate + miętowy akcent.
+   Selektor jest mocniejszy od :root, więc wygrywa niezależnie od kolejności. */
+
+html[data-motyw="narzedzia"] {
+    /* tło / powierzchnie */
+    --bg:            #1f2735;   /* głębokie tło strony */
+    --bg-gleba:      #232b3a;   /* wstępne tło logowania */
+    --pow-1:         #2d3748;   /* karta / powierzchnia elementu */
+    --pow-2:         #374151;   /* pole formularza, wiersz po najechaniu */
+    --pow-3:         #3d4a5f;   /* przycisk wsteczny, menu */
+    --pow-wznoszona: #34415a;   /* element unoszący się: menu, modal */
+
+    /* linie */
+    --linia:         rgba(148, 163, 184, 0.18);
+    --linia-mocna:   rgba(148, 163, 184, 0.30);
+    --linia-cicha:   rgba(148, 163, 184, 0.08);
+
+    /* tekst */
+    --tekst:         #e2e8f0;
+    --tekst-2:       #abc0d2;
+    --tekst-3:       #9aaec2;
+
+    /* Tekst na akcencie */
+    --na-akcencie:   #08201d;
+
+    /* akcent — MIĘTA, jedyna barwa akcentu w tym motywie */
+    --akcent:        #2dd4bf;
+    --akcent-jasny:  #5eead4;
+    --akcent-ciemny: #0d9488;
+    --akcent-hover:  #14b8a6;
+    --akcent-tlo:    rgba(45, 212, 191, 0.14);
+    --akcent-obwod:  rgba(45, 212, 191, 0.42);
+
+    /* stany */
+    --ok:            #34d399;
+    --ostrzezenie:   #fbbf24;
+    --blad:          #f87171;
+}
+
+/* --------------------------------------------------------- motyw: Linear */
+
+/* Trzeci motyw. Wariant monochromatyczny i lżejszy: akcentem jest JASNOŚĆ,
+   nie barwa. Promienie mniejsze (8 / 12 px), linie cieńsze, hierarchia
+   budowana tłem powierzchni. Kształt i odstępy zostają wspólne z resztą
+   systemu — podmieniamy wyłącznie tokeny i kilka odpowiedzi na interakcję. */
+
+html[data-motyw="linear"] {
+    /* tło / powierzchnie */
+    --bg:            #0e1013;
+    --bg-gleba:      #0b0d0f;
+    --pow-1:         #16181d;
+    --pow-2:         #1d2026;
+    --pow-3:         #26292f;
+    --pow-wznoszona: #1b1e24;
+
+    /* linie — białe, włosowe */
+    --linia:         rgba(255, 255, 255, 0.09);
+    --linia-mocna:   rgba(255, 255, 255, 0.16);
+    --linia-cicha:   rgba(255, 255, 255, 0.05);
+
+    /* tekst */
+    --tekst:         #f5f6f7;
+    --tekst-2:       #9b9ea6;
+    --tekst-3:       #8d9199;
+
+    /* Tekst na akcencie */
+    --na-akcencie:   #0e1013;
+
+    /* akcent — bez barwy: biel i szarość */
+    --akcent:        #e8e8e6;
+    --akcent-jasny:  #ffffff;
+    --akcent-ciemny: #9b9ea6;
+    --akcent-hover:  #b9bcc2;
+    --akcent-tlo:    rgba(255, 255, 255, 0.07);
+    --akcent-obwod:  rgba(255, 255, 255, 0.22);
+
+    /* stany */
+    --ok:            #4dc97b;
+    --ostrzezenie:   #e5a84b;
+    --blad:          #f87171;
+
+    /* kształt — mniejszy niż w „Rytmie kodu" */
+    --r-kontrolka:   8px;
+    --r-powierzchnia: 12px;
+}
+
+/* Interakcje wariantu Linear: odpowiedzią jest tło i obrys, nie ruch — bez
+   liftu, bez skalowania okładki. Nagłówek rozmywa treść pod sobą jak w Linear. */
+
+html[data-motyw="linear"] .naglowek {
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(10px);
+    background: rgba(14, 16, 19, 0.65);
+    border-bottom: 1px solid var(--linia);
+    z-index: 5;
+}
+/* Przezroczysty obrys rezerwuje 1 px, więc hover nie przesuwa siatki. */
+html[data-motyw="linear"] .karta {
+    border: 1px solid transparent;
+    transition: background 0.16s ease, border-color 0.16s ease;
+}
+html[data-motyw="linear"] .karta:hover {
+    background: var(--pow-2);
+    border-color: var(--linia-mocna);
+}
+/* Odznaki: sam obrys, bez wypełnienia — mniej tuszu, ten sam sygnał. */
+html[data-motyw="linear"] .badge {
+    border: 1px solid var(--linia);
+    background: transparent;
+    font-weight: 500;
+}
+/* Przycisk główny bez kolorowego wypełnienia: powierzchnia + obrys. */
+html[data-motyw="linear"] .przycisk,
+html[data-motyw="linear"] .dodaj {
+    background: var(--pow-3);
+    color: var(--tekst);
+    border: 1px solid var(--linia);
+}
+html[data-motyw="linear"] .przycisk:hover:not(:disabled),
+html[data-motyw="linear"] .dodaj:hover:not(:disabled) {
+    background: var(--pow-2);
+    border-color: var(--linia-mocna);
+}
+html[data-motyw="linear"] .chip { background: rgba(255, 255, 255, 0.05); }
+
+/* ---------------------------------------------------------------- reset */
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+    margin: 0;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    color: var(--tekst);
+    font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    font-feature-settings: 'ss01' on, 'cv01' on;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Kolumna o kontrolowanej szerokości. #app to cały widok (nagłówek, pasek,
+   panel, treść), więc ograniczenie go trzyma wszystko w jednej spójnej
+   kolumnie wyśrodkowanej na dużych ekranach. Modale i toasty są position:
+   fixed — zostają wyśrodkowane w oknie przeglądarki. */
+#app {
+    width: 100%;
+    max-width: var(--max-kolumna);
+    margin-inline: auto;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* Cyfry, które porównujemy, muszą się nie zwijać inaczej niż sąsiednie */
+.metoda,
+.stat-liczba,
+.stat-wartosc,
+.stat-pasek,
+.siatka-num,
+.detal-metryczka dd,
+.metryczka dd,
+.licznik,
+.wiersz-meta,
+.podsumowanie-import dd,
+.isbn,
+input[type='number'],
+input[inputmode='numeric'] { font-variant-numeric: tabular-nums; }
+
+h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.02em; text-wrap: balance; }
+p { margin: 0; }
+
+a { color: var(--akcent-jasny); }
+
+::selection { background: var(--akcent); color: var(--na-akcencie); }
+
+:focus-visible {
+    outline: 2px solid var(--akcent-jasny);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Pasek przewijania — element przeglądarki też należy do systemu */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--pow-3) transparent;
+}
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+    background: var(--pow-3);
+    border-radius: var(--r-chip);
+    border: 3px solid var(--bg);
+}
+*::-webkit-scrollbar-thumb:hover { background: var(--linia-mocna); }
+
+/* --------------------------------------------------------------- przyciski */
+
+.przycisk,
+.przycisk-pusty,
+.przycisk-niebezpieczny {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--p-2);
+    min-height: 44px;
+    padding: 0 var(--p-4);
+    border-radius: var(--r-kontrolka);
+    border: 1px solid transparent;
+    font: inherit;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease,
+        transform 0.14s ease;
+}
+.przycisk:active:not(:disabled) { transform: translateY(1px); }
+.przycisk:disabled { opacity: 0.45; cursor: default; }
+
+.przycisk {
+    background: var(--akcent);
+    color: var(--na-akcencie);
+}
+/* Hover rozjaśnia akcent, bo tekst na przycisku jest ciemny (--na-akcencie);
+   ciemniejsze tło dałoby kontrast 2.84:1. */
+.przycisk:hover:not(:disabled) { background: var(--akcent-hover); }
+
+.przycisk-pusty {
+    background: var(--pow-1);
+    border-color: var(--linia);
+    color: var(--tekst-2);
+}
+.przycisk-pusty:hover:not(:disabled) {
+    color: var(--tekst);
+    border-color: var(--akcent-obwod);
+    background: var(--pow-2);
+}
+
+.przycisk-niebezpieczny {
+    background: transparent;
+    border-color: rgba(248, 113, 113, 0.4);
+    color: var(--blad);
+}
+.przycisk-niebezpieczny:hover:not(:disabled) { background: rgba(248, 113, 113, 0.12); }
+
+/* Ikona-squircle: kwadratowy, jeden z rysowanych ikon */
+.ikona {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tap);
+    height: var(--tap);
+    flex: 0 0 var(--tap);
+    border: 1px solid var(--linia);
+    border-radius: var(--r-kontrolka);
+    background: var(--pow-1);
+    color: var(--tekst-2);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
+}
+.ikona:hover { border-color: var(--akcent-obwod); color: var(--tekst); background: var(--pow-2); }
+.ikona:active { transform: translateY(1px); }
+.ikona-mala { width: 32px; height: 32px; flex-basis: 32px; border-radius: 8px; }
+.ikona svg { width: 20px; height: 20px; }
+.ikona-mala svg { width: 15px; height: 15px; }
+
+/* ----------------------------------------------------------------- nagłówek */
+
+.naglowek {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: var(--p-3);
+    padding: var(--p-3) var(--p-4);
+    background: color-mix(in srgb, var(--pow-1) 92%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--linia);
+}
+/* Logo bierze kolor z AKTYWNEGO motywu: `color` na .logo zasila `currentColor`
+   w SVG (litera B i strony książki), a `--logo-jasny` rozjaśnia strony.
+   Dzięki temu w „Linear" logo jest białe, a w „Narzędziach" miętowe — bez
+   ani jednego twardego niebieskiego w pliku SVG. */
+.naglowek .logo {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    color: var(--akcent);
+    --logo-jasny: var(--akcent-jasny);
+}
+.naglowek-akcje {
+    display: flex;
+    align-items: center;
+    gap: var(--p-2);
+    /* Zabiera resztę nagłówka: akcje przy prawej krawędzi, a przycisk powrotu
+       (margin-right: auto) ląduje po LEWEJ — w tym samym rzędzie co Edytuj/Usuń
+       i na tej samej wysokości, osobny wiersz poniżej nie jest potrzebny. */
+    flex: 1 1 auto;
+    justify-content: flex-end;
+}
+/* Przycisk powrotu w nagłówku zawsze po lewej stronie swojego kontenera. */
+.naglowek .powrot-lewy { margin-right: auto; }
+.naglowek .logo svg { display: block; width: 34px; height: 34px; border-radius: 9px; }
+.naglowek h1 {
+    font-size: 1.06rem;
+    /* Nie rośnie — resztę nagłówka zabiera .naglowek-akcje, dzięki czemu
+       przycisk powrotu stoi po lewej, a nie przyklejony do prawej krawędzi. */
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.wersja {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--tekst-3);
+    font-variant-numeric: tabular-nums;
+    flex: 0 0 auto;
+}
+.naglowek .przycisk-pusty,
+.naglowek .przycisk-niebezpieczny {
+    min-height: 36px;
+    padding: 0 var(--p-3);
+    font-size: 0.85rem;
+}
+.naglowek .przycisk { min-height: 36px; padding: 0 var(--p-3); font-size: 0.86rem; }
+
+/* Wybieracz motywu — kompaktowy dropdown w nagłówku. Przycisk to zwykła
+   ikona (.ikona), a lista korzysta ze stylu .wybieracz-lista, żeby menu
+   wyglądało jak reszta UI. Otwiera się w prawo od przycisku (prawa krawędź
+   nagłówka), więc lista wyrównuje się do prawej. */
+.motyw-menu { position: relative; flex: 0 0 auto; }
+.motyw-menu .motyw-lista {
+    left: auto;
+    right: 0;
+    min-width: 186px;
+}
+.motyw-menu .motyw-lista li {
+    justify-content: flex-start;
+    gap: var(--p-2);
+}
+.motyw-menu .motyw-lista li svg {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+}
+
+/* Na telefonie nagłówek ma dwa rzędy: marka + tytuł, potem akcje.
+   Wszystko w jednym rzędzie nie mieściło się w 390 px (Wyloguj wychodził
+   poza ekran). */
+@media (max-width: 560px) {
+    .naglowek { flex-wrap: wrap; row-gap: var(--p-2); }
+    .naglowek h1 { flex: 1 1 auto; }
+    .wersja { display: none; }
+    .naglowek-akcje { width: 100%; justify-content: flex-end; }
+}
+
+@media (max-width: 420px) {
+    .naglowek {
+        flex-wrap: nowrap;
+        gap: var(--p-1);
+        padding-top: calc(var(--p-2) + env(safe-area-inset-top, 0px));
+        padding-bottom: var(--p-2);
+        padding-left: calc(var(--p-3) + env(safe-area-inset-left, 0px));
+        padding-right: calc(var(--p-3) + env(safe-area-inset-right, 0px));
+        min-height: 0;
+    }
+    /* Nazwa aplikacji nie może się ucinać, a „Wyloguj" bez etykiety byłby
+       pustym prostokątem — dlatego zmniejszamy stopień pisma zamiast ukrywać tekst. */
+    .naglowek h1 { font-size: 0.86rem; white-space: nowrap; }
+    .naglowek .wersja { display: none; }
+    .naglowek #wyloguj {
+        min-width: 0;
+        padding: 0 var(--p-2);
+        min-height: 36px;
+        font-size: 0.78rem;
+    }
+    /* flex-basis z .ikona to --tap (44 px) — width sam nie wystarczy. */
+    .naglowek .ikona { width: 34px; height: 34px; flex: 0 0 34px; }
+    .naglowek .ikona svg { width: 18px; height: 18px; }
+    .naglowek-akcje { width: auto; flex-wrap: nowrap; }
+}
+
+/* Telefony 360 px i węższe: dokładamy miejsca na pełną nazwę zamiast ją ucinać. */
+@media (max-width: 380px) {
+    .naglowek {
+        padding-left: calc(var(--p-2) + env(safe-area-inset-left, 0px));
+        padding-right: calc(var(--p-2) + env(safe-area-inset-right, 0px));
+    }
+    /* min-width 44 px pochodzi z reguły @media (pointer: coarse) dla celów dotykowych. */
+    .naglowek .logo { width: 40px; height: 40px; flex: 0 0 40px; min-width: 40px; min-height: 40px; }
+    .naglowek .ikona { width: 32px; height: 32px; flex: 0 0 32px; }
+    .naglowek .ikona svg { width: 17px; height: 17px; }
+    .naglowek #wyloguj { font-size: 0.72rem; padding: 0 4px; }
+    .naglowek { gap: 2px; }
+}
+
+/* 320–340 px: nazwa nie ma szans się zmieścić — zostaje dla czytników ekranu,
+   wizualnie aplikację reprezentuje logo. Lepiej to niż „Bibliot…". */
+@media (max-width: 340px) {
+    .naglowek h1 {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+    }
+}
+
+.kropka {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: var(--r-chip);
+    background: var(--akcent);
+    color: var(--na-akcencie);
+    font-size: 0.7rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+.strzalka { display: inline-flex; align-items: center; }
+.strzalka svg { width: 14px; height: 14px; }
+
+/* ------------------------------------------------------------------ pasek */
+
+.pasek {
+    display: flex;
+    align-items: center;
+    gap: var(--p-2);
+    padding: var(--p-3) var(--p-4);
+    background: var(--bg);
+    border-bottom: 1px solid var(--linia);
+    flex-wrap: wrap;
+}
+.pasek input[type='search'] { flex: 1 1 220px; min-width: 160px; max-width: 520px; }
+/* Dodaj stoi po LEWEJ stronie paska, Filtry i przełącznik widoku — po prawej
+   (druga strona rzędu). margin-right: auto rozpycha rząd na obie strony.
+   Przycisk celowo większy i szerszy od reszty narzędzi. */
+.dodaj {
+    text-decoration: none;
+    flex: 0 0 auto;
+    margin-right: auto;
+    min-height: 48px;
+    padding: 0 var(--p-5);
+    font-size: 1rem;
+}
+.dodaj svg { width: 18px; height: 18px; }
+@media (max-width: 560px) {
+    /* Wyszukiwanie na całą szerokość, potem rząd: Dodaj (lewo)
+       — Filtry i widok (prawo). */
+    .pasek { row-gap: var(--p-2); }
+    .pasek input[type='search'] { flex: 1 0 100%; max-width: none; }
+}
+
+/* Pasek regału — wyłącznie NAPIS: liczba egzemplarzy po lewej, nazwa kontekstu
+   po prawej. Graficzna reprezentacja liczby (moduły/paski) została usunięta:
+   liczba książek jest już podana słownie, a pasek kodu zajmował uwagę bez
+   informacji. Zostaje sam cienki wiersz kontekstowy. */
+.pasek-regal {
+    --wysokosc: 26px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--p-3);
+    padding: 0 var(--p-4);
+    height: var(--wysokosc);
+    background: var(--pow-1);
+    border-bottom: 1px solid var(--linia);
+    overflow: hidden;
+}
+.pasek-regal .regal-liczba {
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--tekst);
+}
+.pasek-regal .regal-nazwa {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: var(--akcent-jasny);
+}
+.pasek-regal .regal-nazwa svg { width: 13px; height: 13px; }
+.pasek-regal .regal-nazwa:empty { display: none; }
+
+/* Wiersz kontekstowy widoku (półka / wypożyczone / do przeczytania) */
+.pasek-polki {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--p-2);
+    padding: var(--p-2) var(--p-4);
+    background: var(--bg-gleba);
+    border-bottom: 1px solid var(--linia);
+}
+.pasek-polki-nazwa { font-weight: 800; font-size: 0.92rem; }
+.pasek-polki-opis { color: var(--tekst-3); font-size: 0.8rem; }
+
+/* ----------------------------------------------------------- panel filtrów */
+
+.panel-filtrow {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+    gap: var(--p-2);
+    align-items: end;
+    padding: var(--p-3) var(--p-4);
+    background: var(--bg-gleba);
+    border-bottom: 1px solid var(--linia);
+}
+/* Atrybut hidden musi wygrywać z display: grid wyżej */
+.panel-filtrow[hidden] { display: none; }
+/* Skrót do widoku „do przeczytania" — to nawigacja, nie filtr,
+   więc wyróżniony kolorem akcentu. */
+.panel-filtrow .panel-szybki { color: var(--akcent-jasny); }
+
+.panel-filtrow label,
+.pole {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--tekst-3);
+    min-width: 0;
+}
+.pole em,
+.panel-filtrow label em {
+    font-style: normal;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--tekst-3);
+    opacity: 0.75;
+}
+.pole-pusto {
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 500;
+    font-size: 0.82rem;
+    color: var(--tekst-3);
+}
+
+/* Ikony SVG — zawsze z rozmiarem. Ikona trafia do kodu HTML w kilku miejscach
+   bez lokalnej reguły CSS, a bez width/height domyślne 300x150 rwie layout. */
+svg { width: 1em; height: 1em; flex: 0 0 auto; display: inline-block; vertical-align: -0.125em; }
+.przycisk svg,
+.przycisk-pusty svg,
+.przycisk-niebezpieczny svg { width: 18px; height: 18px; }
+.ikona svg { width: 20px; height: 20px; }
+.wiersz-info svg,
+.detal-info svg { width: 1.05em; height: 1.05em; }
+
+/* ----------------------------------------------------------------- pola */
+
+/* :not() zamiast listy typów — pola w formularzu nie mają atrybutu type
+   i wymykały się temu selektorowi (białe tło z motywu przeglądarki). */
+input:not([type='checkbox']):not([type='radio']):not([type='file']),
+select,
+textarea {
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--tekst);
+    background: var(--pow-2);
+    border: 1px solid var(--linia);
+    border-radius: var(--r-kontrolka);
+    padding: 11px var(--p-3);
+    min-height: var(--tap);
+    outline: none;
+    transition: border-color 0.14s ease, background 0.14s ease;
+    width: 100%;
+}
+textarea {
+    min-height: 96px;
+    resize: vertical;
+    line-height: 1.55;
+}
+input::placeholder, textarea::placeholder { color: var(--tekst-3); }
+
+/* Selektor bazowy pól to `input:not(...):not(...):not(...)` — specificity (0,3,1),
+   więc samo `input:focus` / `input.pole--blad` (0,1,1) przegrywało z jego `border:`
+   i obwódka zostawała szara. Stąd ta sama seria `:not()` w stanach. */
+input:not([type='checkbox']):not([type='radio']):not([type='file']):hover,
+select:hover,
+textarea:hover { border-color: var(--linia-mocna); }
+input:not([type='checkbox']):not([type='radio']):not([type='file']):focus,
+select:focus,
+textarea:focus {
+    border-color: var(--akcent);
+    background: var(--pow-3);
+    box-shadow: 0 0 0 3px var(--akcent-tlo);
+}
+input:not([type='checkbox']):not([type='radio']):not([type='file']).pole--blad,
+select.pole--blad,
+textarea.pole--blad {
+    border-color: var(--blad);
+    box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.18);
+}
+input[type='date'] { min-width: 0; }
+/* ikona kalendarza w systemowym kolorze wygląda jak dziura w motywie */
+input[type='date']::-webkit-calendar-picker-indicator {
+    filter: invert(0.72) sepia(0.2) saturate(2) hue-rotate(190deg);
+    cursor: pointer;
+    opacity: 0.8;
+}
+input[type='date']::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+
+datalist option { background: var(--pow-2); color: var(--tekst); }
+
+/* ----------------------------------------------------- własny dropdown (wybieracz) */
+
+.wybieracz { position: relative; display: block; }
+.wybieracz-przycisk {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--p-2);
+    width: 100%;
+    min-height: var(--tap);
+    padding: 11px var(--p-3);
+    background: var(--pow-2);
+    border: 1px solid var(--linia);
+    border-radius: var(--r-kontrolka);
+    color: var(--tekst);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.14s ease, background 0.14s ease;
+}
+.wybieracz-przycisk:hover { border-color: var(--linia-mocna); }
+.wybieracz-przycisk[aria-expanded='true'] {
+    border-color: var(--akcent);
+    box-shadow: 0 0 0 3px var(--akcent-tlo);
+}
+.wybieracz-wartosc { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wybieracz-strzalka {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    color: var(--tekst-3);
+    transition: transform 0.16s ease;
+}
+.wybieracz-przycisk[aria-expanded='true'] .wybieracz-strzalka { transform: rotate(180deg); }
+
+.wybieracz-lista {
+    position: absolute;
+    z-index: 60;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 100%;
+    max-height: 264px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 5px;
+    list-style: none;
+    background: var(--pow-wznoszona);
+    border: 1px solid var(--linia-mocna);
+    border-radius: var(--r-powierzchnia);
+    box-shadow: var(--cien-menu);
+    animation: lista-wjazd 0.14s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.wybieracz-lista[hidden] { display: none; }
+@keyframes lista-wjazd {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: none; }
+}
+.wybieracz-lista li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--p-3);
+    min-height: 40px;
+    padding: var(--p-2) var(--p-3);
+    border-radius: var(--r-kontrolka);
+    font-size: 0.92rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--tekst-2);
+    cursor: pointer;
+}
+.wybieracz-lista li:hover { background: var(--pow-3); color: var(--tekst); }
+.wybieracz-lista li[aria-selected='true'] {
+    background: var(--akcent);
+    color: var(--na-akcencie);
+    font-weight: 700;
+}
+
+/* ----------------------------------------------------------------- okładki */
+
+.okladka,
+.okladka-miejsce {
+    display: block;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    background: var(--pow-2);
+    border-radius: var(--r-kontrolka);
+    border: 1px solid var(--linia);
+}
+img.okladka {
+    background: var(--pow-2);
+    border: 1px solid var(--linia);
+}
+/* Placeholder okładki: gładka powierzchnia z jednym pasem modułów u góry —
+   spójny z resztą systemu (kolejny „dekoracyjny pasek" to szum). */
+.okladka-miejsce {
+    display: grid;
+    place-items: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: var(--tekst-3);
+    background: radial-gradient(120% 90% at 50% 0%, var(--pow-3), var(--pow-2) 70%);
+    border-top: 3px solid var(--linia-mocna);
+}
+.mini-zdjecie {
+    width: 128px;
+    border-radius: var(--r-kontrolka);
+    border: 1px solid var(--linia);
+}
+
+/* ---------------------------------------------------------------- katalog */
+
+.tresc-lista {
+    flex: 1;
+    padding: var(--p-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--p-3);
+    min-height: 0;
+}
+.tresc {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--p-4);
+    padding: var(--p-7) var(--p-5);
+    text-align: center;
+}
+.tresc-szeroka {
+    align-items: stretch;
+    text-align: left;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+}
+.tresc h2 { font-size: 1.25rem; }
+.tresc p { color: var(--tekst-2); max-width: 46ch; }
+.tresc-szeroka p { max-width: 70ch; }
+
+.ladowanie { color: var(--tekst-3); padding: var(--p-5) 0; }
+
+.licznik { display: none; }   /* liczbę niesie pasek regału */
+
+.pusty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--p-4);
+    padding: var(--p-7) var(--p-5);
+    color: var(--tekst-2);
+    text-align: center;
+}
+.pusty p { max-width: 40ch; }
+
+/* siatka */
+.siatka {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: var(--p-4) var(--p-3);
+    width: 100%;
+}
+.karta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--p-2);
+    text-decoration: none;
+    color: inherit;
+    min-width: 0;
+    /* SYGNATURA: mikro-moduły u góry karty — długość pasa niesie ocenę */
+    background-image: repeating-linear-gradient(
+        90deg, var(--akcent) 0 1px, transparent 1px 7px);
+    background-repeat: no-repeat;
+    background-size: calc(var(--ocena, 0) * 20%) 3px;
+    background-position: top left;
+    padding-top: 3px;
+    border-radius: var(--r-kontrolka);
+    transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.karta:hover { transform: translateY(-2px); }
+.karta:active { transform: none; }
+.karta-tresc {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    gap: 3px;
+    padding-top: var(--p-1);
+    min-width: 0;
+}
+/* Pierwsza odznaka przykleja się do dola karty — dzięki temu statusy w
+   siatce są wyrównane mimo różnej liczby tagów i ocen. */
+.karta .badge:first-of-type { margin-top: auto; }
+.karta .chip-row { align-content: start; }
+.karta .chip-row:empty { display: none; }
+.karta-tytul {
+    font-size: 0.88rem;
+    font-weight: 700;
+    line-height: 1.32;
+    letter-spacing: -0.01em;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.karta-autor {
+    font-size: 0.78rem;
+    color: var(--tekst-3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.karta .chip-row { margin: 2px 0 0; }
+
+/* lista */
+.lista { display: flex; flex-direction: column; width: 100%; }
+.wiersz {
+    display: grid;
+    grid-template-columns: 40px 1fr auto;
+    align-items: center;
+    gap: var(--p-3);
+    min-height: var(--tap);
+    padding: var(--p-2) var(--p-3);
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 1px solid var(--linia-cicha);
+    transition: background 0.12s ease;
+}
+.wiersz:hover { background: var(--pow-1); }
+.wiersz:active { background: var(--pow-2); }
+.wiersz .okladka,
+.wiersz .okladka-miejsce { width: 40px; height: 60px; border-radius: 6px; }
+.wiersz-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+.wiersz-info b {
+    font-size: 0.9rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.wiersz-info > span { font-size: 0.78rem; color: var(--tekst-3); }
+.wiersz-meta {
+    display: none;
+    font-size: 0.74rem;
+    color: var(--tekst-3);
+}
+/* Obie odznaki (wypożyczenie + status) w jednej kolumnie — bez tego
+   cztery elementy siatki przy trzech kolumnach zjeżdżały na drugi wiersz. */
+.wiersz-stany {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+}
+.wiersz .chip-row { margin: 0; }
+
+/* ------------------------------------------------------------- odznaki/chipy */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    align-self: flex-start;
+    padding: 2px var(--p-2);
+    border-radius: var(--r-chip);
+    border: 1px solid var(--linia);
+    background: var(--pow-2);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--tekst-2);
+    white-space: nowrap;
+}
+/* Stan niesze ikona (kształt), kolor tylko wzmianką */
+.badge svg { width: 12px; height: 12px; flex: 0 0 12px; }
+/* Wariant listy: sama ikona, bez tekstu — kompaktowy sygnał stanu */
+.badge--ikona { padding: 3px 7px; }
+.badge--ikona svg { width: 15px; height: 15px; flex-basis: 15px; }
+.badge--chce_przeczytac { color: var(--tekst-3); }
+.badge--chce_przeczytac svg { color: var(--tekst-3); }
+.badge--w_trakcie { color: var(--akcent-jasny); border-color: var(--akcent-obwod); }
+.badge--przeczytane { color: var(--ok); border-color: rgba(52, 211, 153, 0.4); }
+.badge--wypozyczona { color: var(--ostrzezenie); border-color: rgba(251, 191, 36, 0.45); }
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip {
+    display: inline-block;
+    flex: 0 0 auto;
+    padding: 2px var(--p-2);
+    border-radius: var(--r-chip);
+    background: var(--akcent-tlo);
+    border: 1px solid var(--akcent-obwod);
+    color: var(--akcent-jasny);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background 0.14s ease;
+}
+.chip:hover { background: rgba(59, 130, 246, 0.26); }
+.chip[role='button'] { cursor: pointer; }
+.chip--polka {
+    background: var(--pow-3);
+    border-color: var(--linia-mocna);
+    color: var(--tekst-2);
+}
+.chip--polka:hover { background: var(--linia-mocna); }
+.chip--polka svg { width: 11px; height: 11px; vertical-align: -1px; margin-right: 3px; }
+
+/* --------------------------------------------------------------- karta książki */
+
+.detal {
+    display: grid;
+    grid-template-columns: minmax(240px, 320px) 1fr;
+    gap: var(--p-6);
+    padding: var(--p-5) var(--p-4) var(--p-7);
+    width: 100%;
+    align-items: start;
+}
+@media (max-width: 860px) {
+    .detal { grid-template-columns: 1fr; gap: var(--p-5); }
+    .detal-okladka { max-width: 280px; }
+}
+@media (max-width: 640px) {
+    .detal-okladka { max-width: 100%; }
+}
+.detal-info { display: flex; flex-direction: column; gap: var(--p-3); min-width: 0; }
+.detal-info h2 { font-size: 1.45rem; line-height: 1.22; }
+.detal-info .autor { color: var(--tekst-2); font-size: 0.95rem; margin: -6px 0 0; }
+
+.detal-metryczka {
+    display: grid;
+    grid-template-columns: min-content 1fr;
+    gap: var(--p-2) var(--p-4);
+    margin: var(--p-2) 0;
+    padding: var(--p-4) 0;
+    border-top: 1px solid var(--linia);
+    border-bottom: 1px solid var(--linia);
+    font-size: 0.88rem;
+}
+.detal-metryczka dt {
+    color: var(--tekst-3);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding-top: 2px;
+}
+.detal-metryczka dd { margin: 0; overflow-wrap: anywhere; }
+
+.detal-opis {
+    color: var(--tekst-2);
+    font-size: 0.92rem;
+    line-height: 1.65;
+    max-width: 68ch;
+}
+.detal-etykiety { display: flex; flex-direction: column; gap: var(--p-2); }
+.detal-akcje { display: flex; gap: var(--p-2); flex-wrap: wrap; }
+.detal-zdjecie {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--p-2);
+    padding-top: var(--p-4);
+    border-top: 1px solid var(--linia);
+}
+.etykieta {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--tekst-3);
+}
+
+/* ----------------------------------------------------------- panel wypożyczenia */
+
+.panel-wypozyczenia {
+    display: flex;
+    flex-direction: column;
+    gap: var(--p-2);
+    padding: var(--p-4);
+    border: 1px solid var(--linia);
+    border-radius: var(--r-powierzchnia);
+    background: var(--pow-1);
+}
+.panel-wypozyczenia.jest {
+    border-color: rgba(251, 191, 36, 0.35);
+    background: linear-gradient(180deg, rgba(251, 191, 36, 0.07), transparent 60%), var(--pow-1);
+}
+.wypozyczona-info { display: flex; flex-direction: column; gap: 2px; margin: 0; }
+.wypozyczona-info b { color: var(--ostrzezenie); font-size: 1rem; }
+.wypozyczona-info span { color: var(--tekst-3); font-size: 0.82rem; }
+.wypozyczona-uwagi { font-style: italic; }
+
+.historia { margin-top: var(--p-2); }
+.historia summary {
+    cursor: pointer;
+    color: var(--tekst-3);
+    font-size: 0.82rem;
+    padding: var(--p-1) 0;
+}
+.historia summary:hover { color: var(--tekst-2); }
+.historia ul { list-style: none; margin: var(--p-2) 0 0; padding: 0; }
+.historia li {
+    display: flex;
+    align-items: center;
+    gap: var(--p-2);
+    padding: var(--p-2) 0;
+    border-bottom: 1px solid var(--linia-cicha);
+    font-size: 0.84rem;
+}
+.historia li span:first-child { flex: 1; font-weight: 700; }
+.historia li span:nth-child(2) { color: var(--tekst-3); font-variant-numeric: tabular-nums; }
+
+/* lista aktywnych wypożyczeń */
+.lista-wypozyczen {
+    display: grid;
+    gap: var(--p-3);
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+.karta-wypozyczenia {
+    display: flex;
+    gap: var(--p-3);
+    align-items: center;
+    padding: var(--p-3);
+    border: 1px solid var(--linia);
+    border-radius: var(--r-powierzchnia);
+    background: var(--pow-1);
+    text-decoration: none;
+    color: inherit;
+}
+.karta-wypozyczenia:hover { border-color: var(--akcent-obwod); }
+.karta-wypozyczenia .okladka,
+.karta-wypozyczenia .okladka-miejsce { width: 48px; height: 72px; flex: 0 0 48px; }
+.wyp-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.wyp-info b {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.92rem;
+}
+.wyp-info span { color: var(--tekst-3); font-size: 0.8rem; }
+.wyp-info .wyp-kto { color: var(--ostrzezenie); font-weight: 700; }
+
+/* ----------------------------------------------------------------- formularz */
+
+.forma {
+    flex: 1;
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: var(--p-5) var(--p-4) var(--p-7);
+    display: flex;
+    flex-direction: column;
+    gap: var(--p-4);
+}
+.forma h2 { font-size: 1.3rem; }
+.pole-wiersz {
+    display: flex;
+    gap: var(--p-2);
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+.pole-wiersz .pole { flex: 1 1 240px; }
+/* Wiersz ISBN: pole na całą szerokość, potem dwa przyciski dzielące rząd na
+   pół. Kolejność w HTML to **Skanuj, potem Szukaj** — skan jest częstszym
+   pierwszym krokiem przy dodawaniu (właściciel: 2026-10-04), a przycisk po
+   lewej wypełnia pas palca na telefonie. Kolejności **nie** ustawiamy przez
+   `order` w CSS: kiedyś przestawimy znaczniki i reguła zrobiłaby dokładnie
+   odwrotność zamierzonej. */
+.pole-isbn .pole { flex: 1 1 100%; }
+.pole-isbn > .przycisk,
+.pole-isbn > .przycisk-pusty { flex: 1 1 0; min-width: 0; }
+.siatka-pol {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--p-3);
+}
+.forma-akcje {
+    display: flex;
+    gap: var(--p-2);
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    padding-top: var(--p-2);
+    border-top: 1px solid var(--linia);
+}
+/* Miejsce na blok akcji. Puste nie może zostawiać odstępu — `.forma` jest
+   kolumną flex z `gap`, więc pusty <div> dodałby jedną pustą przerwę. */
+.slot-akcji { display: none; }
+.slot-akcji:not(:empty) { display: block; }
+/* Akcje po udanym odczycie: u góry formularza, więc „Zapisz w katalogu”
+   jest widoczny bez przewijania przez całą metrykę. Bez `sticky` — pasek
+   przyklejony pod sticky nagłówkiem (`z-index: 30`) chowałby się za nim. */
+#slot-akcji-gora:not(:empty) .forma-akcje {
+    border-top: none;
+    border-bottom: 1px solid var(--linia);
+    padding-top: 0;
+    padding-bottom: var(--p-2);
+}
+.status-lookup { font-size: 0.82rem; color: var(--tekst-3); min-height: 1.2em; }
+
+/* „Odczytano kod, ale to nie ISBN”. Jedyny sygnał odróżniający
+   „dekoder nie trafia w kod” od „trafia, ale walidacja odrzuca” —
+   do 0.23.2 oba przypadki wyglądały identycznie (ciche false).
+   Selektor `.modal > …`, nie sama klasa: reguła `.modal > p` (0,1,1)
+   wygrywała z `.skaner-odczyt` (0,1,0) i zabierała jej bursztynowy
+   kolor — sygnał wyglądał jak zwykły podpis i ginął w interfejsie. */
+.modal > .skaner-odczyt {
+    margin: 0;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ostrzezenie);
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+.skaner-odczyt[hidden] { display: none; }
+
+/* ---------------------------------------------------------------- checkboxy */
+
+.checkboxy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--p-2);
+    padding: var(--p-3);
+    border: 1px solid var(--linia);
+    border-radius: var(--r-kontrolka);
+    background: var(--pow-2);
+}
+.checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--p-2);
+    min-height: 34px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--tekst-2);
+}
+.checkbox input {
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    border: 1px solid var(--linia-mocna);
+    border-radius: 6px;
+    background: var(--pow-1);
+    cursor: pointer;
+    transition: background 0.14s ease, border-color 0.14s ease;
+}
+.checkbox input:checked { background: var(--akcent); border-color: var(--akcent); }
+.checkbox input:checked::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    clip-path: polygon(20% 52%, 12% 62%, 40% 84%, 88% 30%, 79% 21%, 40% 68%);
+}
+.checkbox span { display: flex; align-items: center; gap: var(--p-2); }
+.checkbox em {
+    color: var(--tekst-3);
+    font-style: normal;
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------------------ modale */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: grid;
+    place-items: center;
+    padding: var(--p-4);
+    background: rgba(4, 7, 12, 0.72);
+    backdrop-filter: blur(4px);
+    animation: zaslona 0.16s ease;
+}
+@keyframes zaslona { from { opacity: 0; } to { opacity: 1; } }
+
+.modal {
+    width: min(420px, 100%);
+    max-height: min(86dvh, 720px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--p-3);
+    padding: var(--p-5);
+    background: var(--pow-wznoszona);
+    border: 1px solid var(--linia-mocna);
+    border-radius: var(--r-powierzchnia);
+    box-shadow: var(--cien-modal);
+    animation: modal-wjazd 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-szerszy { width: min(560px, 100%); }
+@keyframes modal-wjazd {
+    from { opacity: 0; transform: translateY(8px) scale(0.99); }
+    to   { opacity: 1; transform: none; }
+}
+.modal h3 { font-size: 1.08rem; }
+.modal > p { color: var(--tekst-2); font-size: 0.88rem; }
+.modal-przyciski {
+    display: flex;
+    gap: var(--p-2);
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    margin-top: var(--p-2);
+}
+.modal-opcje { flex-direction: column; }
+.modal-opcje .przycisk,
+.modal-opcje .przycisk-pusty { width: 100%; justify-content: flex-start; }
+
+/* ------------------------------------------------------------- skaner */
+
+/*
+ * Pułapka: <video> bez żadnej reguły CSS dostaje domyślne 300x150 px,
+ * a detektor kodów pracuje na pikselach — mały rozmazany kadr oznaczał,
+ * że kod książki nie wchodził w pole widzenia. Dlatego wideo rozciąga się
+ * na całą szerokość modala w proporcjach kamery.
+ */
+.skaner { width: min(520px, 100%); }
+.skaner-powierzchnia {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border: 1px solid var(--linia-mocna);
+    border-radius: var(--r-powierzchnia);
+    background: #05070c;
+}
+/* `!important` jest konieczny: html5-qrcode wstawia <video> z atrybutem
+ * style="width: 306px", który bije każdą regułę z arkusza. Bez tego obraz
+ * z kamery był 306 px szerokości niezależnie od szerokości modala — i to,
+ * a nie brak aparatu, było powodem słabego odczytu kodów. */
+.skaner-powierzchnia video {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+}
+/* Kontenery html5-qrcode dostają 100 %, nasza ramka — własny rozmiar */
+.skaner-powierzchnia > div:not(.skaner-cel),
+.skaner-powierzchnia > span { width: 100% !important; }
+/* Własna ramka zastępuje biblioteczną (dwie ramki to wygląda jak błąd) */
+.skaner-powierzchnia #qr-shaded-region { display: none !important; }
+.skaner-powierzchnia #qr-canvas { display: none !important; }
+.skaner-powierzchnia a[href*="github"],
+.skaner-powierzchnia a[href*="html5-qrcode"] { display: none; }
+
+/* Ramka celu: kod ma być wyraźnie „w kadrze", nie na całym ekranie.
+   Przyciemnienie dookoła kieruje wzrok na ramkę — bez niego użytkownik
+   nie wie, gdzie trzymać książkę, a kod trzymany bokiem wypada
+   z pola przeszukiwanego przez detektor. */
+.skaner-cel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 88%;
+    height: 46%;
+    transform: translate(-50%, -50%);
+    border: 2px solid rgba(232, 238, 248, 0.9);
+    border-radius: var(--r-kontrolka);
+    box-shadow: 0 0 0 100vmax rgba(4, 7, 12, 0.45);
+    pointer-events: none;
+}
+.skaner-powierzchnia.skaner-torcz .skaner-cel { border-color: var(--akcent-jasny); }
+
+/* Błąd aparatu: pokazujemy go W MODALU (nie toastem) i zostawiamy drogę
+   wyjścia — „Spróbuj ponownie” po zmianie ustawień Chrome oraz „Wpisz ISBN”.
+   Wcześniej modal się zamykał i użytkownik zostawał z samym komunikatem. */
+.skaner-powierzchnia[data-ukryte] { display: none; }
+.skaner-powierzchnia.skaner-wczytywanie { display: grid; place-items: center; }
+.skaner-wczytywanie::after {
+    content: 'Włączam aparat…';
+    color: var(--tekst-3);
+    font-size: 0.82rem;
+}
+.skaner-blad {
+    display: flex;
+    flex-direction: column;
+    gap: var(--p-2);
+    padding: var(--p-3) var(--p-4);
+    background: var(--bg-gleba);
+    border: 1px solid var(--linia);
+    border-left: 2px solid var(--blad);
+    border-radius: var(--r-kontrolka);
+}
+.skaner-blad-tytul {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--tekst);
+}
+.skaner-blad-tekst {
+    margin: 0;
+    font-size: 0.84rem;
+    line-height: 1.5;
+    color: var(--tekst-2);
+}
+.skaner-blad .modal-przyciski { margin-top: var(--p-1); }
+.skaner-blad .modal-przyciski .przycisk,
+.skaner-blad .modal-przyciski .przycisk-pusty { flex: 1 1 0; }
+
+/* Wklejanie ISBN — wyjście, gdy aparat jest niedostępny */
+.skaner-wklej {
+    display: flex;
+    flex-direction: column;
+    gap: var(--p-2);
+}
+.skaner-wklej-podpowiedz {
+    margin: 0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--tekst-3);
+}
+.skaner-wklej-blad {
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--blad);
+}
+
+/* Podgląd tego, co widzi detektor. Pokazuje się dopiero po ~3 s bez
+   trafienia — na drodze „działa” jest zbędny, a gdy nie działa, odróżnia
+   „kod jest nieczytelny w kadrze” od „kadr jest zły”. */
+.skaner-podglad {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    padding: var(--p-2);
+    background: var(--bg-gleba);
+    border: 1px solid var(--linia);
+    border-radius: var(--r-kontrolka);
+}
+.skaner-podglad[hidden] { display: none; }
+.skaner-podglad canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    background: #000;
+    /* Pikselowa interpolacja: rozmiar bufora jest zawsze ≤ szerokości
+       urządzeniowej, więc CSS może tylko powiększać. Wygładzanie rozmazywałoby
+       krawędzie pasków, a to jedyna rzecz, po której widać, czy dekoder da
+       radę odczytać kod. */
+    image-rendering: pixelated;
+}
+.skaner-podglad figcaption {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tekst-3);
+    text-align: center;
+}
+/* Diagnostyka na urządzeniu: ścieżka dekodera, kadr, próby, odczyty,
+   odrzucenia i ostatnia odczytana wartość. Rozdziela trzy stany, które
+   z zewnątrz wyglądają identycznie („nie czyta”): pętla nie ruszyła /
+   dekoder nie radzi sobie z obrazem / kod czytany, ale odrzucony przez
+   walidację ISBN. Pusty <p> nie może zostawiać pustego rzędu. */
+.skaner-diag {
+    margin: 2px 0 0;
+    font: 0.66rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color: var(--tekst-3);
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+.skaner-diag:empty { display: none; }
+
+/* Powiększenie: kod na grzbiecie bywa ułamkiem kadru, a aparat systemowy ma
+   zoom — strona do 0.21.0 nie miała. Kafelek 44 px zgodnie z --tap. */
+.skaner-zoom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--p-2);
+}
+.skaner-zoom .przycisk-pusty {
+    width: var(--tap);
+    min-width: var(--tap);
+    padding: 0;
+}
+.skaner-zoom-poziom {
+    min-width: 46px;
+    text-align: center;
+    color: var(--tekst-2);
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Pasek narzędzi: latarka po lewej, anulowanie po prawej.
+   `margin-left: auto` zamiast `space-between` — inaczej po usunięciu
+   przycisku latarki (aparat bez latarki) „Anuluj” skacze pod lewą krawędź. */
+.skaner-narzedzia {
+    display: flex;
+    align-items: center;
+    gap: var(--p-2);
+}
+.skaner-narzedzia .modal-przyciski {
+    margin-top: 0;
+    margin-left: auto;
+}
+
+/* Stan włączonej latarki niesie kształt ikony, nie sam kolor */
+.przycisk-pusty.wlaczony {
+    color: var(--tekst);
+    border-color: var(--akcent-obwod);
+    background: var(--pow-2);
+}
+.przycisk-pusty.wlaczony .ikona { filter: drop-shadow(0 0 4px var(--akcent)); }
+/* Latarka niedostępna (np. Firefoks nie zna `torch`). Świadomie NIE ustawiamy
+   atrybutu `disabled` — przycisk bez reakcji na dotyk wygląda na zepsuty,
+   a na telefonie nie widać też `title`. Przycisk zostaje klikalny i po
+   dotknięciu pokazuje wyjaśnienie. */
+.skaner-latarka[data-brak] {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+.skaner-latarka[data-brak] .ikona { filter: none; }
+.modal-opis { color: var(--tekst-3); font-size: 0.84rem; }
+.modal-opis code {
+    background: var(--pow-2);
+    padding: 1px 5px;
+    border-radius: 5px;
+    font-size: 0.9em;
+}
+.modal .pole {
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--tekst-3);
+    font-size: 0.72rem;
+}
+.modal .pole span { font-size: 0.72rem; }
+
+/* --------------------------------------------------------------- toast */
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: var(--p-2);
+    position: fixed;
+    left: 50%;
+    bottom: var(--p-5);
+    transform: translateX(-50%);
+    z-index: 90;
+    max-width: min(440px, calc(100vw - 32px));
+    padding: var(--p-3) var(--p-4);
+    border-radius: var(--r-kontrolka);
+    background: var(--pow-wznoszona);
+    border: 1px solid var(--linia-mocna);
+    box-shadow: var(--cien-menu);
+    font-size: 0.88rem;
+    animation: toast-wjazd 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.toast svg { width: 16px; height: 16px; flex: 0 0 16px; }
+.toast--ok { color: var(--ok); }
+.toast--blad { color: var(--blad); }
+@keyframes toast-wjazd {
+    from { opacity: 0; transform: translate(-50%, 10px); }
+    to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* --------------------------------------------------------- zarządzanie półkami */
+
+.lista-polk {
+    list-style: none;
+    margin: var(--p-3) 0;
+    padding: 0;
+    border: 1px solid var(--linia);
+    border-radius: var(--r-kontrolka);
+    max-height: 300px;
+    overflow-y: auto;
+}
+.lista-polk li {
+    display: flex;
+    align-items: center;
+    gap: var(--p-3);
+    padding: var(--p-2) var(--p-3);
+    border-bottom: 1px solid var(--linia-cicha);
+}
+.lista-polk li:last-child { border-bottom: none; }
+.lista-polka-nazwa { flex: 1; color: var(--tekst); text-decoration: none; font-weight: 700; }
+.lista-polka-nazwa:hover { color: var(--akcent-jasny); }
+.lista-polka-ile { color: var(--tekst-3); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+.dodaj-polka { display: flex; gap: var(--p-2); }
+.dodaj-polka input { flex: 1; }
+
+/* ----------------------------------------------------------------- import */
+
+.import-podsumowanie {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--p-1) var(--p-4);
+    margin: var(--p-3) 0;
+    padding: var(--p-3);
+    border: 1px solid var(--linia);
+    border-radius: var(--r-kontrolka);
+    background: var(--pow-2);
+    font-size: 0.86rem;
+}
+.import-podsumowanie dt { color: var(--tekst-3); }
+.import-podsumowanie dd { margin: 0; font-weight: 700; }
+.import-wynik {
+    border: 1px solid rgba(52, 211, 153, 0.4);
+    background: rgba(52, 211, 153, 0.08);
+    border-radius: var(--r-kontrolka);
+    padding: var(--p-3);
+    margin-top: var(--p-3);
+}
+.import-wynik.jest-blad { border-color: rgba(248, 113, 113, 0.45); background: rgba(248, 113, 113, 0.08); }
+.import-wynik p { margin: var(--p-1) 0 0; color: var(--tekst-2); font-size: 0.84rem; }
+
+/* ------------------------------------------------- metryczka egzemplarza */
+
+.segmenty { display: flex; flex-wrap: nowrap; gap: 5px; }
+.segment {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 40px;
+    padding: var(--p-2) var(--p-2);
+    border: 1px solid var(--linia);
+    border-radius: var(--r-kontrolka);
+    background: var(--pow-2);
+    color: var(--tekst-2);
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
+}
+.segment:hover { border-color: var(--linia-mocna); color: var(--tekst); }
+.segment.jest {
+    background: var(--akcent-tlo);
+    border-color: var(--akcent);
+    color: var(--akcent-jasny);
+}
+.segment--pusty { flex: 0 1 auto; color: var(--tekst-3); }
+.segment:focus-visible { outline: 2px solid var(--akcent-jasny); outline-offset: 2px; }
+
+/* -------------------------------------------------------------------- oceny */
+
+.gwiazdki { display: inline-flex; align-items: center; gap: 1px; line-height: 1; }
+.gwiazdka {
+    background: none;
+    border: none;
+    padding: 0 1px;
+    font-size: 1.05rem;
+    line-height: 1.2;
+    color: var(--pow-3);
+    cursor: default;
+}
+.gwiazdka.jest-zaznaczona { color: var(--ostrzezenie); }
+.gwiazdki--maly .gwiazdka { font-size: 0.82rem; }
+.gwiazdka.przycisk { cursor: pointer; transition: transform 0.12s ease, color 0.12s ease; }
+.gwiazdka.przycisk:hover { transform: scale(1.18); color: var(--ostrzezenie); }
+.gwiazdka.przycisk:focus-visible { outline: 2px solid var(--akcent-jasny); outline-offset: 1px; }
+.gwiazdka--wyczysc {
+    margin-left: var(--p-1);
+    font-size: 0.7rem;
+    color: var(--tekst-3);
+    cursor: pointer;
+}
+.gwiazdka--wyczysc:hover { color: var(--tekst); }
+
+/* --------------------------------------------------------------- statystyki */
+
+.statystyki h2 { margin-bottom: var(--p-5); }
+.stat-siatka {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--p-3);
+    margin-bottom: var(--p-5);
+}
+.stat-kafelka {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--p-4);
+    border: 1px solid var(--linia);
+    border-radius: var(--r-powierzchnia);
+    background: var(--pow-1);
+    /* SYGNATURA: pasek modułów u góry kafelka */
+    background-image: repeating-linear-gradient(
+        90deg, var(--akcent) 0 1px, transparent 1px 6px);
+    background-repeat: no-repeat;
+    background-size: 42% 3px;
+    background-position: top left;
+    padding-top: calc(var(--p-4) + 3px);
+}
+.stat-liczba {
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--akcent-jasny);
+}
+.stat-etykieta { font-size: 0.84rem; font-weight: 700; }
+.stat-podpis { color: var(--tekst-3); font-size: 0.76rem; }
+
+.stat-kolumny {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--p-4);
+    align-items: start;
+}
+.stat-blok {
+    padding: var(--p-4);
+    border: 1px solid var(--linia);
+    border-radius: var(--r-powierzchnia);
+    background: var(--pow-1);
+}
+.stat-blok h3 {
+    margin-bottom: var(--p-3);
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--tekst-3);
+}
+.stat-blok--do-uzupelnienia { border-color: rgba(251, 191, 36, 0.3); }
+.stat-szeregi { list-style: none; margin: 0; padding: 0; }
+.stat-szereg {
+    display: grid;
+    grid-template-columns: minmax(72px, 1.1fr) minmax(40px, 2fr) auto;
+    align-items: center;
+    gap: var(--p-3);
+    padding: 5px 0;
+}
+.stat-nazwa {
+    font-size: 0.84rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.stat-szereg-srodek { display: block; min-width: 0; overflow: hidden; }
+.stat-pasek {
+    display: block;
+    height: 7px;
+    min-width: 3px;
+    border-radius: 2px;
+    background: var(--akcent);
+}
+.stat-wartosc { font-size: 0.82rem; font-weight: 700; white-space: nowrap; }
+.stat-wartosc em { color: var(--tekst-3); font-style: normal; font-weight: 400; }
+.stat-stopka { color: var(--tekst-3); font-size: 0.76rem; margin-top: var(--p-2); }
+.stat-chipy .chip em { font-style: normal; color: var(--tekst-3); margin-left: 4px; }
+
+/* ------------------------------------------------------------ skróty/stopka */
+
+.skroty {
+    padding: var(--p-3) var(--p-4) var(--p-5);
+    color: var(--tekst-3);
+    font-size: 0.74rem;
+    text-align: center;
+}
+/* Stopka telefonowa: wersja zamiast skrót klawiaturowych. Skróty bez
+   klawiatury fizycznej są martwe, a wersja znika z nagłówka poniżej 560 px
+   (`.wersja { display: none }`) — więc zostawiamy ją w jednym miejscu na obu. */
+.skroty-mobile {
+    display: none;
+    padding: var(--p-3) var(--p-4) var(--p-5);
+    color: var(--tekst-3);
+    font-size: 0.74rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+@media (max-width: 560px) {
+    .skroty { display: none; }
+    .skroty-mobile { display: block; }
+}
+.skroty kbd {
+    display: inline-block;
+    padding: 1px 6px;
+    border: 1px solid var(--linia-mocna);
+    border-bottom-width: 2px;
+    border-radius: 6px;
+    background: var(--pow-2);
+    font-family: inherit;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--tekst-2);
+}
+.stopka {
+    padding: var(--p-3);
+    border-top: 1px solid var(--linia);
+    color: var(--tekst-3);
+    font-size: 0.76rem;
+    text-align: center;
+}
+
+/* --------------------------------------------------------------- logowanie */
+
+.ekran-logowania {
+    flex: 1 1 auto;
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: var(--p-5);
+    background:
+        radial-gradient(120% 80% at 50% -10%, rgba(59, 130, 246, 0.16), transparent 60%),
+        var(--bg-gleba);
+}
+.karta-logowania {
+    width: min(360px, 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--p-2);
+    padding: var(--p-6) var(--p-5);
+    background: var(--pow-1);
+    border: 1px solid var(--linia);
+    border-radius: var(--r-powierzchnia);
+    box-shadow: var(--cien-menu);
+    text-align: center;
+}
+.karta-logowania img { width: 52px; height: 52px; border-radius: var(--r-powierzchnia); }
+.karta-logowania h1 { font-size: 1.35rem; margin-top: var(--p-2); }
+.karta-logowania p { color: var(--tekst-3); font-size: 0.86rem; margin-bottom: var(--p-5); }
+#form-logowania { width: 100%; display: flex; flex-direction: column; gap: var(--p-2); }
+.blad {
+    color: var(--blad);
+    font-size: 0.82rem;
+    min-height: 1.2em;
+    text-align: left;
+}
+.blad:empty { min-height: 0; }
+
+/* ---------------------------------------------------------------- reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ---------------------------------------------------------------- touch targets */
+
+@media (pointer: coarse) {
+    .chip {
+        min-height: 32px;
+        padding-block: 6px;
+    }
+    .naglowek .logo {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* ---------------------------------------------------------------- safe area (PWA standalone) */
+
+.naglowek {
+    padding-top: calc(var(--p-3) + env(safe-area-inset-top, 0px));
+    padding-left: calc(var(--p-4) + env(safe-area-inset-left, 0px));
+    padding-right: calc(var(--p-4) + env(safe-area-inset-right, 0px));
+}
+.toast {
+    bottom: calc(var(--p-5) + env(safe-area-inset-bottom, 0px));
+    padding-left: calc(var(--p-4) + env(safe-area-inset-left, 0px));
+    padding-right: calc(var(--p-4) + env(safe-area-inset-right, 0px));
+}
+.forma-akcje {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}

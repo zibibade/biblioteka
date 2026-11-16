@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pl" data-motyw="rytm">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Biblioteka</title>
+    <meta name="description" content="Katalog książek ze skanowaniem ISBN">
+    <meta name="theme-color" content="#0B0F17">
+    <!-- Motyw czytamy z localStorage PRZED style.css, żeby po odświeżeniu nie
+         mrugnął domyślny (FOUC). Zapasowo zostaje „rytm" z atrybutu <html>.
+         Trzy motywy: rytm (niebieski), linear (mono), narzedzia (mięta). -->
+    <script>
+        (function () {
+            var motyw = 'rytm';
+            try {
+                var zapisany = localStorage.getItem('bib.motyw');
+                if (zapisany === 'rytm' || zapisany === 'linear' || zapisany === 'narzedzia') {
+                    motyw = zapisany;
+                }
+            } catch (e) { /* brak dostępu do localStorage → motyw domyślny */ }
+            document.documentElement.dataset.motyw = motyw;
+            var meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) {
+                var kolory = { rytm: '#0B0F17', linear: '#0e1013', narzedzia: '#1f2735' };
+                meta.setAttribute('content', kolory[motyw] || '#0B0F17');
+            }
+        })();
+    </script>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    <!-- Manrope self-hosted (PWA działa bez sieci zewnętrznych) -->
+    <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/manrope-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app" aria-live="polite"></div>
+    <noscript>Ta aplikacja wymaga włączonej obsługi JavaScript.</noscript>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# Nie wysyłaj do obrazu sekretów ani danych lokalnej instalacji.
+.git
+.gitignore
+AGENTS.md
+config.php
+install.lock
+.env
+*.log
+uploads/okladki
+uploads/okladki-ebooki
+uploads/zdjecia
