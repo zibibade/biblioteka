@@ -1,0 +1,61 @@
+name: lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  php:
+    name: PHP (php -l)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_mysql, curl, zip
+          coverage: none
+      - name: Składnia wszystkich plików PHP
+        run: |
+          set -e
+          pliki=$(git ls-files '*.php')
+          echo "$pliki" | wc -l | xargs echo "plików PHP:"
+          for f in $pliki; do php -l "$f"; done
+
+  js:
+    name: JavaScript (node --check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Składnia wszystkich plików JS
+        run: |
+          set -e
+          for f in $(git ls-files 'js/*.js' 'sw.js'); do node --check "$f"; done
+          echo "JS OK"
+
+  schema:
+    name: Schemat bazy (schema.sql)
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: biblioteka
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wczytanie schema.sql na czystą bazę
+        run: |
+          mysql -h 127.0.0.1 -uroot -proot biblioteka < schema.sql
+          ile=$(mysql -h 127.0.0.1 -uroot -proot -N -e \
+            "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='biblioteka'")
+          echo "tabel: $ile"
+          test "$ile" -eq 12

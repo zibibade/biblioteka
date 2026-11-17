@@ -1,0 +1,42 @@
+name: Propozycja funkcji
+description: Pomysł na nową funkcję albo usprawnienie.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Zanim opiszesz pomysł: aplikacja ma zostać mała. Świadomie **nie ma** kont
+        użytkowników, chmury i wypożyczania online — jeśli propozycja wymaga jednej
+        z tych rzeczy, napisz, dlaczego bez niej się nie da.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Jaki problem to rozwiązuje
+      description: Opisz sytuację, w której obecna wersja Ci nie wystarcza. Nie zaczynaj od rozwiązania.
+    validations:
+      required: true
+
+  - type: textarea
+    id: propozycja
+    attributes:
+      label: Propozycja
+      description: Jak to ma działać z punktu widzenia osoby, która klika.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatywy
+    attributes:
+      label: Co robisz teraz zamiast tego
+      description: Obejście, inne narzędzie, ręczna robota — to pokazuje, ile funkcja jest warta.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: zakres
+    attributes:
+      label: Zakres
+      options:
+        - label: To da się zrobić bez kont użytkowników i bez usług w chmurze.
+        - label: Jestem gotów przetestować to na własnej instalacji.

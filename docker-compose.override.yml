@@ -1,0 +1,21 @@
+---
+# LOKALNY OVERRIDE (tylko ta maszyna) — usuwany po testach.
+# /etc/docker/daemon.json ustawia dns 172.17.0.1 (dnsmasq na moście), ale wtedy
+# Docker traci wbudowany resolver i nazwa usługi "db" nie działa. Rozwiązanie:
+# stały adres IP bazy + zwykły DNS hosta (potrzebny do lookupu ISBN).
+services:
+  db:
+    dns: [172.17.0.1]
+    networks:
+      default:
+        ipv4_address: 172.28.0.10
+  app:
+    dns: [172.17.0.1]
+    environment:
+      BIB_DB_HOST: 172.28.0.10
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 /* -------------------------------------------------------------- wersja */
 // Podbijaj X.Y.Z przy KAŻDEJ zmianie (nawet kosmetycznej) + wpis w CHANGELOG.md
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.1.1';
 
 /* --------------------------------------------------- baza danych (MySQL) */
 const DB_HOST = 'localhost';

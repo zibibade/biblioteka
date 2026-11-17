@@ -1,11 +1,41 @@
 # Biblioteka
 
+[![lint](https://github.com/zibibade/biblioteka/actions/workflows/lint.yml/badge.svg)](https://github.com/zibibade/biblioteka/actions/workflows/lint.yml)
+[![licencja: MIT](https://img.shields.io/badge/licencja-MIT-2dd4bf.svg)](LICENSE)
+[![wersja](https://img.shields.io/badge/wersja-1.1.1-3b82f6.svg)](CHANGELOG.md)
+
 Domowy katalog książek jako PWA. Dwa równoległe zbiory: **księgozbiór papierowy**
 i **ebooki**. Katalog papierowy opisuje fizyczne egzemplarze, ebooki — tylko
 metadane plików: same pliki zostają na urządzeniu użytkownika, na serwer trafia
 wyłącznie miniatura okładki.
 
 Jedno hasło do całej aplikacji, dane w jednej bazie MySQL, brak kont użytkowników.
+
+**Strona projektu:** https://zbind.pl/biblioteka/
+
+![Katalog Biblioteki — siatka okładek z filtrami](docs/img/katalog.png)
+
+Przegląd: katalog → filtr → karta książki
+
+![Przegląd katalogu](docs/img/przeglad.gif)
+
+## Instalacja w skrócie
+
+1. Wgraj pliki na hosting (PHP 8.1+, MySQL 8).
+2. Otwórz `install.php`, podaj dane bazy i hasło do aplikacji.
+3. Zaloguj się i dodaj pierwszą książkę.
+
+Albo: `cp .env.example .env && docker compose up -d --build` → `http://localhost:8080`.
+Szczegóły niżej, w sekcji [Instalacja](#instalacja).
+
+## Zrzuty ekranu
+
+| | |
+|---|---|
+| ![Katalog papierowy](docs/img/katalog.png) | ![Widok ebooków](docs/img/ebooki.png) |
+| Katalog papierowy — siatka okładek, tagi, statusy, oceny | Ebooki — metadane i miniatury, bez plików na serwerze |
+| ![Statystyki](docs/img/statystyki.png) | ![Skan ISBN na telefonie](docs/img/skaner.png) |
+| Statystyki — osobno papier i ebooki | Skan ISBN — metryczka z Biblioteki Narodowej |
 
 ## Stos
 

@@ -1,0 +1,75 @@
+name: Zgłoszenie błędu
+description: Coś nie działa — opisz, co się stało.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Dziękuję za zgłoszenie. Zanim wyślesz: sprawdź, czy problem występuje też po
+        odświeżeniu z pominięciem cache (Ctrl+Shift+R) i czy w `config.php` masz aktualną
+        `APP_VERSION`.
+
+  - type: input
+    id: wersja
+    attributes:
+      label: Wersja aplikacji
+      description: Numer widoczny w nagłówku aplikacji (np. 1.1.0) albo z `CHANGELOG.md`.
+      placeholder: 1.1.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: instalacja
+    attributes:
+      label: Jak aplikacja jest uruchomiona
+      options:
+        - Kreator install.php na hostingu
+        - Docker (docker compose)
+        - Ręcznie (config.php + schema.sql)
+        - Nie wiem
+    validations:
+      required: true
+
+  - type: input
+    id: srodowisko
+    attributes:
+      label: Środowisko
+      description: PHP, MySQL/MariaDB, przeglądarka i system — w jednej linii.
+      placeholder: PHP 8.3, MariaDB 10.11, Chrome 141 na Androidzie 15
+    validations:
+      required: true
+
+  - type: textarea
+    id: kroki
+    attributes:
+      label: Kroki do powtórzenia
+      description: Numerowana lista. Jeśli problem dotyczy skanera, napisz, jaki kod (EAN-13/Code-128) i czy działa ścieżka ręczna.
+      placeholder: |
+        1. Otwieram #/dodaj
+        2. Skanuję kod ISBN z grzbietu
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: oczekiwane
+    attributes:
+      label: Co powinno się stać
+    validations:
+      required: true
+
+  - type: textarea
+    id: faktyczne
+    attributes:
+      label: Co się dzieje
+      description: Treść komunikatu, zrzut ekranu, wpis z konsoli przeglądarki (F12 → Console).
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: prywatnosc
+    attributes:
+      label: Dane
+      options:
+        - label: Usunąłem z treści hasła, klucze API i adresy mojego serwera.
+          required: true

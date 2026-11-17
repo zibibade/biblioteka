@@ -3,6 +3,22 @@
 Konwencja: numeracja **X.Y.Z** — wpis przy **każdej** zmianie, nawet kosmetycznej.
 Wersja z tej listy musi zgadzać się z `APP_VERSION` w `config.php` (widoczna w stopce).
 
+## 1.1.1 (2026-11-17)
+
+**Projekt jako repozytorium publiczne.** Zmiany dotyczą dokumentacji i automatyzacji,
+kod aplikacji bez zmian funkcjonalnych.
+
+1. **`docs/img/` ze zrzutami ekranu** — katalog, ebooki, statystyki, skan ISBN
+   i animowany przegląd (GIF). README pokazuje je pod opisem, bo bez obrazków
+   nikt nie kliknie w repozytorium o katalogu książek.
+2. **`.github/workflows/lint.yml`** — trzy zadania: `php -l` na wszystkich plikach
+   PHP, `node --check` na JS oraz wczytanie `schema.sql` na czystą bazę MySQL 8
+   z kontrolą, że powstało 12 tabel. Plakietka stanu w README.
+3. **`.github/ISSUE_TEMPLATE/`** — formularze zgłoszenia błędu (wersja, środowisko,
+   kroki, oczekiwane zachowanie) i propozycji funkcji (najpierw problem, potem
+   rozwiązanie) + `CONTRIBUTING.md` z zasadami: bez frameworka, bez CDN, owner-scope
+   w każdym endpoincie, wpis w changelogu przy każdej zmianie.
+
 ## 1.1.0 (2026-11-16)
 
 **Instalacja bez edytowania plików.** Dwie nowe drogi uruchomienia aplikacji,
